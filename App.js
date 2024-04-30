@@ -3,10 +3,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import SplashScreen from './screens/SplashScreen'
-import HomePage from './screens/HomePage'
-import HealthCheckUpReminders from './screens/HealthCheckUpReminders'
-
+import SplashScreen from './screens/SplashScreen';
+import HomePage from './screens/HomePage';
+import HealthCheckUpReminders from './screens/HealthCheckUpReminders';
+import VaccinationReminders from './screens/VaccinationReminders';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -18,6 +18,7 @@ const App = () => {
       <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
       <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
       <Stack.Screen name="HealthCheckUpReminders" component={HealthCheckUpReminders} options={{ headerShown: false }} />
+      <Stack.Screen name="VaccinationReminders" component={VaccinationReminders} options={{ headerShown: false }} />
     </Stack.Navigator>
   </NavigationContainer>
   );

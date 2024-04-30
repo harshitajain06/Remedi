@@ -12,7 +12,7 @@ const firebaseConfig = {
   storageBucket: Constants.expoConfig.extra.storageBucket,
   messagingSenderId: Constants.expoConfig.extra.messagingSenderId,
   appId: Constants.expoConfig.extra.appId,
-  databaseURL: Constants.expoConfig.extra.databaseURL,
+  // databaseURL: Constants.expoConfig.extra.databaseURL,
   //   @deprecated is deprecated Constants.manifest
 };
 // initialize firebase
@@ -20,4 +20,4 @@ export const app = initializeApp(firebaseConfig);
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 })
-export const database = getFirestore();
+export const database = getFirestore(app);
