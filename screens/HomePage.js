@@ -20,9 +20,10 @@ const Homepage = ({ navigation }) => {
   return (
     <Animated.View style={[styles.container, { transform: [{ scale: scaleValue }] }]}>
       <Text style={styles.title}>Welcome to Our App</Text>
+      <Text style={styles.title}>What would you like to do today</Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('HealthCheckUpReminders')}>
-          <Text style={styles.buttonText}>Health Check-Up Reminders</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PreventiveHealthCheckUps')}>
+          <Text style={styles.buttonText}>Preventive Health Check-Ups</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MedicineReminders')}>
           <Text style={styles.buttonText}>Medicine Reminders</Text>
@@ -30,8 +31,8 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('HealthRecord')}>
           <Text style={styles.buttonText}>Health Record</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MedicineEncyclopedia')}>
-          <Text style={styles.buttonText}>Medicine Encyclopedia</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('VaccinationReminders')}>
+          <Text style={styles.buttonText}>Vaccinations</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -47,14 +48,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#E9C3BD"
   },
   title: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: 'bold',
-    marginBottom: 50,
+    marginBottom: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    marginTop: 50
   },
   button: {
     alignItems: 'center',

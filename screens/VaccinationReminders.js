@@ -4,7 +4,7 @@ import { Calendar } from 'react-native-calendars';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, database } from '../config/firebase';
 
-const VaccinationReminders = () => {
+const VaccinationReminders = ({navigation}) => {
   const [nextVaccinationDate, setNextVaccinationDate] = useState('');
   const [vaccinationInfo, setVaccinationInfo] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
@@ -33,6 +33,7 @@ const VaccinationReminders = () => {
 
   const handleShowAllVaccinations = () => {
     console.log('Showing all vaccinations');
+    navigation.navigate("AllVaccinations")
   };
 
   return (
