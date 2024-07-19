@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert } from "react-native";
+import { StyleSheet, Text, View, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { Toast, ALERT_TYPE } from 'react-native-alert-notification';
@@ -65,6 +65,7 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -73,10 +74,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: "orange",
     alignSelf: "center",
     paddingBottom: 24,
-    color: "#9A2D2D"
+    color: "#9A2D2D", 
+    marginTop: -80
   },
   input: {
     backgroundColor: "#F6F7FB",
@@ -88,10 +89,9 @@ const styles = StyleSheet.create({
   },
   backImage: {
     width: "100%",
-    height: 350,
-    position: "absolute",
-    top: 0,
-    resizeMode: 'cover',
+    height: 180,
+    resizeMode: 'contain',
+    marginTop: 5,
   },
   whiteSheet: {
     width: '100%',

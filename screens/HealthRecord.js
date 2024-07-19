@@ -45,7 +45,7 @@ const HealthRecord = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('HomePage')}>
           <Text style={styles.headerText}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Edit')}>
@@ -133,7 +133,7 @@ const HealthRecord = ({ navigation }) => {
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={navigation.navigate('MedicalReports')}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("MedicalReports")}>
         <Text style={styles.buttonText}>Open Medical Reports</Text>
       </TouchableOpacity>
     </ScrollView>
