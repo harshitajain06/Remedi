@@ -1,47 +1,116 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Alert, Image } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { database } from '../config/firebase';
+import { storage, database } from '../config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const AddMedicalReport = ({ navigation }) => {
-  const [reportDetails, setReportDetails] = useState('');
+  const [reportName, setReportName] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [additionalDetails, setAdditionalDetails] = useState('');
+  const [image, setImage] = useState(null);
 
   const handleSave = async () => {
     console.log('Saving medical report');
     try {
+      let imageUrl = '';
+      if (image) {
+        const response = await fetch(image);
+        const blob = await response.blob();
+        const storageRef = ref(storage, `medicalReports/${Date.now()}-${reportName}`);
+        await uploadBytes(storageRef, blob);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
       await addDoc(collection(database, 'medicalReports'), {
-        reportDetails,
+        reportName,
+        date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        additionalDetails,
+        imageUrl,
         timestamp: serverTimestamp(),
       });
+
       console.log('Medical report saved successfully.');
       // Clear the form after saving
-      setReportDetails('');
+      setReportName('');
+      setDate(new Date());
+      setAdditionalDetails('');
+      setImage(null);
       navigation.navigate('MedicalReports');
     } catch (error) {
       console.error('Error saving medical report:', error);
+      Alert.alert('Error', 'Failed to save the report. Please try again.');
+    }
+  };
+
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('HomePage')}>
           <Text style={styles.headerText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Edit')}>
-          <Text style={styles.headerText}>Edit</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.title}>Add Medical Report</Text>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Report Details:</Text>
+        <Text style={styles.label}>Report Name:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter report name"
+          value={reportName}
+          onChangeText={setReportName}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Date:</Text>
+        <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
+          <Text style={styles.dateText}>{date.toDateString()}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={onChangeDate}
+          />
+        )}
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Additional Details:</Text>
         <TextInput
           style={[styles.input, styles.multilineInput]}
-          placeholder="Enter report details"
-          value={reportDetails}
-          onChangeText={setReportDetails}
+          placeholder="Enter additional details"
+          value={additionalDetails}
+          onChangeText={setAdditionalDetails}
           multiline
         />
+      </View>
+      <View style={styles.inputContainer}>
+        <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
+          <Text style={styles.buttonText}>Upload Report Image</Text>
+        </TouchableOpacity>
+        {image && <Image source={{ uri: image }} style={styles.image} />}
       </View>
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save</Text>
@@ -72,6 +141,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'black',
   },
   inputContainer: {
     width: '100%',
@@ -80,6 +150,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#9A2D2D',
   },
   input: {
     width: '100%',
@@ -90,17 +161,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#fff',
   },
+  dateInput: {
+    width: '100%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
+  },
+  dateText: {
+    fontSize: 16,
+  },
   button: {
     backgroundColor: '#9A2D2D',
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
     marginTop: 15,
+  },
+  uploadButton: {
+    backgroundColor: '#9A2D2D',
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 15,
+    width: '100%',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    marginTop: 15,
+    borderRadius: 5,
   },
   multilineInput: {
     height: 100,

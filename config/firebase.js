@@ -3,7 +3,9 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import Constants from "expo-constants";
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AsyncStorage} from '@react-native-async-storage/async-storage';
+import { collection } from "firebase/firestore";
+import { getStorage } from 'firebase/storage';
 // Firebase config
 const firebaseConfig = {
   apiKey: Constants.expoConfig.extra.apiKey,
@@ -21,3 +23,6 @@ export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 })
 export const database = getFirestore(app);
+
+export const usersRef = collection(database,'users');
+export const storage = getStorage(app);
