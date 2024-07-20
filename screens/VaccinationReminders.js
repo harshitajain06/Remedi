@@ -38,7 +38,7 @@ const VaccinationReminders = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>VACCINATION</Text>
+      <Text style={styles.title}>Add Vaccination</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Next Vaccination:</Text>
         <TouchableOpacity style={styles.input} onPress={() => setShowCalendar(true)}>

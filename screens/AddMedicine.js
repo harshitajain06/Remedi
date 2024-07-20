@@ -46,7 +46,7 @@ const AddMedicine = ({ navigation }) => {
       setTimesPerDay('');
       setDoseTimes([new Date(), new Date()]);
       setImage(null);
-      navigation.navigate('MedicineList');
+      navigation.navigate('MedicineReminders');
     } catch (error) {
       console.error('Error saving medicine:', error);
       Alert.alert('Error', 'Failed to save the medicine. Please try again.');

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { database } from '../config/firebase';
+import { useNavigation } from '@react-navigation/native';
 
 const AllVaccinations = () => {
   const [vaccinations, setVaccinations] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchVaccinations = async () => {
@@ -31,7 +33,15 @@ const AllVaccinations = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>All Vaccinations</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>All Vaccinations</Text>
+        <TouchableOpacity 
+          style={styles.addButtonContainer}
+          onPress={() => navigation.navigate('VaccinationReminders')}
+        >
+          <Text style={styles.addButton}>+</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={vaccinations}
         renderItem={renderItem}
@@ -47,10 +57,27 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#E9C3BD',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+  },
+  addButtonContainer: {
+    backgroundColor: '#9A2D2D',
+    borderRadius: 50,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addButton: {
+    fontSize: 24,
+    color: '#FFF',
   },
   vaccinationItem: {
     marginBottom: 20,

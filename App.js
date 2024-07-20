@@ -11,6 +11,8 @@ import AllVaccinations from './screens/AllVaccinations';
 import HealthRecord from './screens/HealthRecord';
 import MedicalReports from './screens/MedicalReports';
 import AddMedicalReport from './screens/AddMedicalReport';
+import AddMedicine from './screens/AddMedicine.js';
+import MedicineReminders from './screens/MedicineReminders';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -23,10 +25,12 @@ const App = () => {
       <Stack.Screen name="HomePage" component={HomePage} options={{ headerShown: false }} />
       <Stack.Screen name="HealthCheckUpReminders" component={HealthCheckUpReminders} options={{ headerShown: false }} />
       <Stack.Screen name="VaccinationReminders" component={VaccinationReminders} options={{ headerShown: false }} />
-      <Stack.Screen name="AllVaccinations" component={AllVaccinations} />
+      <Stack.Screen name="AllVaccinations" component={AllVaccinations} options={{ headerShown: false }} />
       <Stack.Screen name="HealthRecord" component={HealthRecord} options={{ headerShown: false }} />
       <Stack.Screen name="MedicalReports" component={MedicalReports} options={{ headerShown: false }} />
       <Stack.Screen name="AddMedicalReport" component={AddMedicalReport} options={{ headerShown: false }}/>
+      <Stack.Screen name="AddMedicine" component={AddMedicine} options={{ title: 'Add Medicine', headerShown: false}} />
+        <Stack.Screen name="MedicineReminders" component={MedicineReminders} options={{ title: 'Medicine Reminders' , headerShown: false}} />
     </Stack.Navigator>
   </NavigationContainer>
   );
