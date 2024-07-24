@@ -31,7 +31,7 @@ const Homepage = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('HealthRecord')}>
           <Text style={styles.buttonText}>Health Record</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('VaccinationReminders')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AllVaccinations')}>
           <Text style={styles.buttonText}>Vaccinations</Text>
         </TouchableOpacity>
       </View>

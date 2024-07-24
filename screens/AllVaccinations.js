@@ -34,6 +34,14 @@ const AllVaccinations = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate('HomePage')}>
+          <Text style={styles.headerText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Edit')}>
+          <Text style={styles.headerText}>Edit</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.titleContainer}>
         <Text style={styles.title}>All Vaccinations</Text>
         <TouchableOpacity 
           style={styles.addButtonContainer}
@@ -58,6 +66,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#E9C3BD',
   },
   header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#9A2D2D',
+  },
+  titleContainer: {
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
