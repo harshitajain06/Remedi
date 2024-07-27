@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Alert, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import * as Notifications from 'expo-notifications';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { storage, database } from '../config/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
+// Set the handler for notifications when the app is foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const AddMedicine = ({ navigation }) => {
   const [medicineName, setMedicineName] = useState('');
@@ -15,6 +25,18 @@ const AddMedicine = ({ navigation }) => {
   const [doseTimes, setDoseTimes] = useState([new Date(), new Date()]);
   const [showDoseTimePickers, setShowDoseTimePickers] = useState([false, false]);
   const [image, setImage] = useState(null);
+
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission required', 'Notification permissions are required for this feature to work.');
+      }
+      console.log(status)
+    };
+
+    requestPermissions();
+  }, []);
 
   const handleSave = async () => {
     console.log('Saving medicine');
@@ -27,7 +49,7 @@ const AddMedicine = ({ navigation }) => {
         await uploadBytes(storageRef, blob);
         imageUrl = await getDownloadURL(storageRef);
       }
-
+  
       await addDoc(collection(database, 'medicines'), {
         medicineName,
         dosage,
@@ -37,7 +59,13 @@ const AddMedicine = ({ navigation }) => {
         imageUrl,
         timestamp: serverTimestamp(),
       });
-
+  
+      doseTimes.forEach((doseTime, index) => {
+        console.log(`Scheduling notification for ${doseTime} with message: Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
+        alert(`Scheduling notification for ${doseTime} with message: Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
+        scheduleNotification(doseTime, `Time for your ${medicineName} medicine, ${dosage} dosage, dose ${index + 1}`);
+      });
+  
       console.log('Medicine saved successfully.');
       // Clear the form after saving
       setMedicineName('');
@@ -52,6 +80,7 @@ const AddMedicine = ({ navigation }) => {
       Alert.alert('Error', 'Failed to save the medicine. Please try again.');
     }
   };
+  
 
   const onChangeTillDate = (event, selectedDate) => {
     const currentDate = selectedDate || tillDate;
@@ -80,6 +109,21 @@ const AddMedicine = ({ navigation }) => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const scheduleNotification = async (time, message) => {
+    console.log(`Scheduling notification at ${time} with message: ${message}`);
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Medicine Reminder',
+        body: message,
+      },
+      trigger: {
+        hour: time.getHours(),
+        minute: time.getMinutes(),
+        repeats: true,
+      },
+    });
   };
 
   return (
