@@ -22,8 +22,8 @@ const AddMedicine = ({ navigation }) => {
   const [tillDate, setTillDate] = useState(new Date());
   const [showTillDatePicker, setShowTillDatePicker] = useState(false);
   const [timesPerDay, setTimesPerDay] = useState('');
-  const [doseTimes, setDoseTimes] = useState([new Date(), new Date()]);
-  const [showDoseTimePickers, setShowDoseTimePickers] = useState([false, false]);
+  const [doseTimes, setDoseTimes] = useState([]);
+  const [showDoseTimePickers, setShowDoseTimePickers] = useState([]);
   const [image, setImage] = useState(null);
 
   useEffect(() => {
@@ -32,11 +32,23 @@ const AddMedicine = ({ navigation }) => {
       if (status !== 'granted') {
         Alert.alert('Permission required', 'Notification permissions are required for this feature to work.');
       }
-      console.log(status)
     };
 
     requestPermissions();
   }, []);
+
+  useEffect(() => {
+    const times = parseInt(timesPerDay, 10);
+    if (!isNaN(times) && times > 0) {
+      const newDoseTimes = Array(times).fill(new Date());
+      const newShowDoseTimePickers = Array(times).fill(false);
+      setDoseTimes(newDoseTimes);
+      setShowDoseTimePickers(newShowDoseTimePickers);
+    } else {
+      setDoseTimes([]);
+      setShowDoseTimePickers([]);
+    }
+  }, [timesPerDay]);
 
   const handleSave = async () => {
     console.log('Saving medicine');
@@ -63,7 +75,7 @@ const AddMedicine = ({ navigation }) => {
       doseTimes.forEach((doseTime, index) => {
         console.log(`Scheduling notification for ${doseTime} with message: Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
         alert(`Scheduling notification for ${doseTime} with message: Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
-        scheduleNotification(doseTime, `Time for your ${medicineName} medicine, ${dosage} dosage, dose ${index + 1}`);
+        scheduleNotification(doseTime, `Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
       });
   
       console.log('Medicine saved successfully.');
@@ -72,7 +84,7 @@ const AddMedicine = ({ navigation }) => {
       setDosage('');
       setTillDate(new Date());
       setTimesPerDay('');
-      setDoseTimes([new Date(), new Date()]);
+      setDoseTimes([]);
       setImage(null);
       navigation.navigate('MedicineReminders');
     } catch (error) {
@@ -80,7 +92,6 @@ const AddMedicine = ({ navigation }) => {
       Alert.alert('Error', 'Failed to save the medicine. Please try again.');
     }
   };
-  
 
   const onChangeTillDate = (event, selectedDate) => {
     const currentDate = selectedDate || tillDate;
@@ -176,34 +187,26 @@ const AddMedicine = ({ navigation }) => {
           keyboardType="numeric"
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>1st Dose Time:</Text>
-        <TouchableOpacity style={styles.dateInput} onPress={() => setShowDoseTimePickers([true, showDoseTimePickers[1]])}>
-          <Text style={styles.dateText}>{doseTimes[0].toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showDoseTimePickers[0] && (
-          <DateTimePicker
-            value={doseTimes[0]}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => onChangeDoseTime(0, event, selectedTime)}
-          />
-        )}
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>2nd Dose Time:</Text>
-        <TouchableOpacity style={styles.dateInput} onPress={() => setShowDoseTimePickers([showDoseTimePickers[0], true])}>
-          <Text style={styles.dateText}>{doseTimes[1].toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showDoseTimePickers[1] && (
-          <DateTimePicker
-            value={doseTimes[1]}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => onChangeDoseTime(1, event, selectedTime)}
-          />
-        )}
-      </View>
+      {doseTimes.map((doseTime, index) => (
+        <View key={index} style={styles.inputContainer}>
+          <Text style={styles.label}>{`${index + 1} Dose Time:`}</Text>
+          <TouchableOpacity style={styles.dateInput} onPress={() => {
+            const newShowDoseTimePickers = [...showDoseTimePickers];
+            newShowDoseTimePickers[index] = true;
+            setShowDoseTimePickers(newShowDoseTimePickers);
+          }}>
+            <Text style={styles.dateText}>{doseTime.toLocaleTimeString()}</Text>
+          </TouchableOpacity>
+          {showDoseTimePickers[index] && (
+            <DateTimePicker
+              value={doseTimes[index]}
+              mode="time"
+              display="default"
+              onChange={(event, selectedTime) => onChangeDoseTime(index, event, selectedTime)}
+            />
+          )}
+        </View>
+      ))}
       <View style={styles.inputContainer}>
         <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
           <Text style={styles.buttonText}>Upload Medicine Image</Text>
