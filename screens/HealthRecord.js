@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { database } from '../config/firebase';
+import { addDoc, collection, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { database, auth } from '../config/firebase'; // Ensure you have the auth and Firestore imports
 
 const HealthRecord = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -13,30 +13,56 @@ const HealthRecord = ({ navigation }) => {
   const [familyHistory, setFamilyHistory] = useState('');
   const [pastHistory, setPastHistory] = useState('');
 
+  useEffect(() => {
+    // Fetch user data from Firestore
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+
+      if (user) {
+        try {
+          const healthRecordRef = doc(database, 'healthRecords', user.uid);
+          const docSnapshot = await getDoc(healthRecordRef);
+
+          if (docSnapshot.exists()) {
+            const userData = docSnapshot.data();
+            setName(userData.name || '');
+            setGender(userData.gender || '');
+            setAge(userData.age || '');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleSave = async () => {
-    console.log('Saving health record');
     try {
-      await addDoc(collection(database, 'healthRecords'), {
-        name,
-        age,
-        gender,
-        bloodGroup,
-        height,
-        weight,
-        familyHistory,
-        pastHistory,
-        timestamp: serverTimestamp(),
-      });
-      console.log('Health record saved successfully.');
-      // Clear the form after saving
-      setName('');
-      setAge('');
-      setGender('');
-      setBloodGroup('');
-      setHeight('');
-      setWeight('');
-      setFamilyHistory('');
-      setPastHistory('');
+      const user = auth.currentUser;
+
+      if (user) {
+        await addDoc(collection(database, 'healthRecords'), {
+          uid: user.uid,
+          name,
+          age,
+          gender,
+          bloodGroup,
+          height,
+          weight,
+          familyHistory,
+          pastHistory,
+          timestamp: serverTimestamp(),
+        });
+        console.log('Health record saved successfully.');
+        // Clear the form after saving
+        setBloodGroup('');
+        setHeight('');
+        setWeight('');
+        setFamilyHistory('');
+        setPastHistory('');
+      }
     } catch (error) {
       console.error('Error saving health record:', error);
     }
@@ -157,6 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#9A2D2D',
+    marginTop: 30,
   },
   title: {
     fontSize: 24,

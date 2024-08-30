@@ -6,67 +6,50 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { storage, database } from '../config/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-const AddMedicine = ({ navigation }) => {
-  const [medicineName, setMedicineName] = useState('');
-  const [dosage, setDosage] = useState('');
-  const [tillDate, setTillDate] = useState(new Date());
-  const [showTillDatePicker, setShowTillDatePicker] = useState(false);
-  const [timesPerDay, setTimesPerDay] = useState('');
-  const [doseTimes, setDoseTimes] = useState([new Date(), new Date()]);
-  const [showDoseTimePickers, setShowDoseTimePickers] = useState([false, false]);
+const AddMedicalReport = ({ navigation }) => {
+  const [reportName, setReportName] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [additionalDetails, setAdditionalDetails] = useState('');
   const [image, setImage] = useState(null);
 
   const handleSave = async () => {
-    console.log('Saving medicine');
+    console.log('Saving medical report');
     try {
       let imageUrl = '';
       if (image) {
         const response = await fetch(image);
         const blob = await response.blob();
-        const storageRef = ref(storage, `medicines/${Date.now()}-${medicineName}`);
+        const storageRef = ref(storage, `medicalReports/${Date.now()}-${reportName}`);
         await uploadBytes(storageRef, blob);
         imageUrl = await getDownloadURL(storageRef);
       }
 
-      await addDoc(collection(database, 'medicines'), {
-        medicineName,
-        dosage,
-        tillDate: tillDate.toISOString().split('T')[0],
-        timesPerDay,
-        doseTimes: doseTimes.map(d => d.toTimeString().split(' ')[0]),
+      await addDoc(collection(database, 'medicalReports'), {
+        reportName,
+        date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        additionalDetails,
         imageUrl,
         timestamp: serverTimestamp(),
       });
 
-      console.log('Medicine saved successfully.');
+      console.log('Medical report saved successfully.');
       // Clear the form after saving
-      setMedicineName('');
-      setDosage('');
-      setTillDate(new Date());
-      setTimesPerDay('');
-      setDoseTimes([new Date(), new Date()]);
+      setReportName('');
+      setDate(new Date());
+      setAdditionalDetails('');
       setImage(null);
-      navigation.navigate('MedicineList');
+      navigation.navigate('MedicalReports');
     } catch (error) {
-      console.error('Error saving medicine:', error);
-      Alert.alert('Error', 'Failed to save the medicine. Please try again.');
+      console.error('Error saving medical report:', error);
+      Alert.alert('Error', 'Failed to save the report. Please try again.');
     }
   };
 
-  const onChangeTillDate = (event, selectedDate) => {
-    const currentDate = selectedDate || tillDate;
-    setShowTillDatePicker(Platform.OS === 'ios');
-    setTillDate(currentDate);
-  };
-
-  const onChangeDoseTime = (index, event, selectedTime) => {
-    const currentTime = selectedTime || doseTimes[index];
-    const newDoseTimes = [...doseTimes];
-    newDoseTimes[index] = currentTime;
-    const newShowDoseTimePickers = [...showDoseTimePickers];
-    newShowDoseTimePickers[index] = Platform.OS === 'ios';
-    setDoseTimes(newDoseTimes);
-    setShowDoseTimePickers(newShowDoseTimePickers);
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios');
+    setDate(currentDate);
   };
 
   const pickImage = async () => {
@@ -89,90 +72,52 @@ const AddMedicine = ({ navigation }) => {
           <Text style={styles.headerText}>Home</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.title}>Add Medicine</Text>
+      <Text style={styles.title}>Add Medical Report</Text>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Name of Medicine:</Text>
+        <Text style={styles.label}>Report Name:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter medicine name"
-          value={medicineName}
-          onChangeText={setMedicineName}
+          placeholder="Enter report name"
+          value={reportName}
+          onChangeText={setReportName}
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Dosage:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter dosage"
-          value={dosage}
-          onChangeText={setDosage}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Till What Date:</Text>
-        <TouchableOpacity style={styles.dateInput} onPress={() => setShowTillDatePicker(true)}>
-          <Text style={styles.dateText}>{tillDate.toDateString()}</Text>
+        <Text style={styles.label}>Date:</Text>
+        <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
+          <Text style={styles.dateText}>{date.toDateString()}</Text>
         </TouchableOpacity>
-        {showTillDatePicker && (
+        {showDatePicker && (
           <DateTimePicker
-            value={tillDate}
+            value={date}
             mode="date"
             display="default"
-            onChange={onChangeTillDate}
+            onChange={onChangeDate}
           />
         )}
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Times Per Day:</Text>
+        <Text style={styles.label}>Additional Details:</Text>
         <TextInput
-          style={styles.input}
-          placeholder="Enter number of times per day"
-          value={timesPerDay}
-          onChangeText={setTimesPerDay}
-          keyboardType="numeric"
+          style={[styles.input, styles.multilineInput]}
+          placeholder="Enter additional details"
+          value={additionalDetails}
+          onChangeText={setAdditionalDetails}
+          multiline
         />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>1st Dose Time:</Text>
-        <TouchableOpacity style={styles.dateInput} onPress={() => setShowDoseTimePickers([true, showDoseTimePickers[1]])}>
-          <Text style={styles.dateText}>{doseTimes[0].toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showDoseTimePickers[0] && (
-          <DateTimePicker
-            value={doseTimes[0]}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => onChangeDoseTime(0, event, selectedTime)}
-          />
-        )}
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>2nd Dose Time:</Text>
-        <TouchableOpacity style={styles.dateInput} onPress={() => setShowDoseTimePickers([showDoseTimePickers[0], true])}>
-          <Text style={styles.dateText}>{doseTimes[1].toLocaleTimeString()}</Text>
-        </TouchableOpacity>
-        {showDoseTimePickers[1] && (
-          <DateTimePicker
-            value={doseTimes[1]}
-            mode="time"
-            display="default"
-            onChange={(event, selectedTime) => onChangeDoseTime(1, event, selectedTime)}
-          />
-        )}
       </View>
       <View style={styles.inputContainer}>
         <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
-          <Text style={styles.buttonText}>Upload Medicine Image</Text>
+          <Text style={styles.buttonText}>Upload Report Image</Text>
         </TouchableOpacity>
         {image && <Image source={{ uri: image }} style={styles.image} />}
       </View>
       <TouchableOpacity style={styles.button} onPress={handleSave}>
-        <Text style={styles.buttonText}>Add Medicine</Text>
+        <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -190,6 +135,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#9A2D2D',
+    marginTop: 30,
   },
   title: {
     fontSize: 24,
@@ -253,6 +199,9 @@ const styles = StyleSheet.create({
     marginTop: 15,
     borderRadius: 5,
   },
+  multilineInput: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
 });
-
-export default AddMedicine;
+export default AddMedicalReport;

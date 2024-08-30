@@ -51,6 +51,12 @@ const AddMedicine = ({ navigation }) => {
   }, [timesPerDay]);
 
   const handleSave = async () => {
+    // Validation for all fields
+    if (!medicineName || !dosage || !tillDate || !timesPerDay || !doseTimes.length || !image) {
+      Alert.alert('Missing Fields', 'Please fill in all required fields and upload an image.');
+      return;
+    }
+
     console.log('Saving medicine');
     try {
       let imageUrl = '';
@@ -61,7 +67,7 @@ const AddMedicine = ({ navigation }) => {
         await uploadBytes(storageRef, blob);
         imageUrl = await getDownloadURL(storageRef);
       }
-  
+
       await addDoc(collection(database, 'medicines'), {
         medicineName,
         dosage,
@@ -71,13 +77,13 @@ const AddMedicine = ({ navigation }) => {
         imageUrl,
         timestamp: serverTimestamp(),
       });
-  
+
       doseTimes.forEach((doseTime, index) => {
         console.log(`Scheduling notification for ${doseTime} with message: Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
         alert(`Scheduling notification for ${doseTime} with message: Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
         scheduleNotification(doseTime, `Time for your ${medicineName} (${dosage}) dose ${index + 1}`);
       });
-  
+
       console.log('Medicine saved successfully.');
       // Clear the form after saving
       setMedicineName('');
@@ -237,6 +243,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#9A2D2D',
+    marginTop: 30
   },
   title: {
     fontSize: 24,

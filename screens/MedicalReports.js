@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#9A2D2D',
+    marginTop: 30
   },
   titleContainer: {
     width: '100%',

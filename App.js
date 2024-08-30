@@ -13,6 +13,7 @@ import MedicalReports from './screens/MedicalReports';
 import AddMedicalReport from './screens/AddMedicalReport';
 import AddMedicine from './screens/AddMedicine.js';
 import MedicineReminders from './screens/MedicineReminders';
+import ProfileScreen from './screens/ProfileScreen.js';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
       <Stack.Screen name="AddMedicalReport" component={AddMedicalReport} options={{ headerShown: false }}/>
       <Stack.Screen name="AddMedicine" component={AddMedicine} options={{ title: 'Add Medicine', headerShown: false}} />
         <Stack.Screen name="MedicineReminders" component={MedicineReminders} options={{ title: 'Medicine Reminders' , headerShown: false}} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
   </NavigationContainer>
   );

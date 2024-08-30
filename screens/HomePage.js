@@ -1,26 +1,38 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Profile from '../assets/profile.jpg';
 
-const Homepage = ({ navigation }) => {
-  const scaleValue = React.useRef(new Animated.Value(0)).current;
-
-  const startAnimation = () => {
-    Animated.timing(scaleValue, {
-      toValue: 1,
-      duration: 500,
-      easing: Easing.linear,
-      useNativeDriver: true,
-    }).start();
-  };
+const Homepage = () => {
+  const navigation = useNavigation();
 
   React.useEffect(() => {
-    startAnimation();
-  }, []);
+    // Set profile icon in the header right
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
+          <Image 
+            source={Profile} 
+            style={styles.profileImage} 
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   return (
-    <Animated.View style={[styles.container, { transform: [{ scale: scaleValue }] }]}>
+    <View style={styles.container}>
+      <TouchableOpacity 
+        style={styles.profileImageContainer}
+        onPress={() => navigation.navigate('ProfileScreen')}
+      >
+        <Image 
+          source={Profile} 
+          style={styles.profileImage} 
+        />
+      </TouchableOpacity>
       <Text style={styles.title}>Welcome to Our App</Text>
-      <Text style={styles.title}>What would you like to do today</Text>
+      <Text style={styles.title}>What would you like to do today?</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PreventiveHealthCheckUps')}>
           <Text style={styles.buttonText}>Preventive Health Check-Ups</Text>
@@ -35,7 +47,7 @@ const Homepage = ({ navigation }) => {
           <Text style={styles.buttonText}>Vaccinations</Text>
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -74,7 +86,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
     fontWeight: 'bold',
-    textAlign:'center'
+    textAlign: 'center'
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 15,
+  },
+  profileImageContainer: {
+    position: 'absolute',
+    top: 30,
+    right: 30,
+    width: 30,
+    height: 30,
   },
 });
 
