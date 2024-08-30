@@ -26,7 +26,8 @@ const AllVaccinations = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.vaccinationItem}>
-      <Text style={styles.itemTitle}>Next Vaccination Date: {item.nextVaccinationDate}</Text>
+      <Text style={styles.itemTitle}>Vaccination Name: {item.vaccinationName}</Text>
+      <Text style={styles.itemDate}>Next Vaccination Date: {item.nextVaccinationDate}</Text>
       <Text style={styles.itemInfo}>Vaccination Info: {item.vaccinationInfo}</Text>
     </View>
   );
@@ -108,6 +109,9 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  itemDate: {
     marginBottom: 5,
   },
   itemInfo: {

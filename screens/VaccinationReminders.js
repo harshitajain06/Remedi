@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, database } from '../config/firebase';
 
-const VaccinationReminders = ({navigation}) => {
+const VaccinationReminders = ({ navigation }) => {
+  const [vaccinationName, setVaccinationName] = useState('');
   const [nextVaccinationDate, setNextVaccinationDate] = useState('');
   const [vaccinationInfo, setVaccinationInfo] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
@@ -15,30 +16,48 @@ const VaccinationReminders = ({navigation}) => {
   };
 
   const handleSave = async () => {
-    console.log('Next Vaccination Date:', nextVaccinationDate);
-    console.log('Vaccination Info:', vaccinationInfo);
+    if (!vaccinationName || !nextVaccinationDate) {
+      Alert.alert('Validation Error', 'Please fill in all compulsory fields.');
+      return;
+    }
+
     try {
       await addDoc(collection(database, 'vaccinations'), {
+        vaccinationName,
         nextVaccinationDate,
         vaccinationInfo,
         timestamp: serverTimestamp(),
       });
+
+      setVaccinationName('');
       setNextVaccinationDate('');
       setVaccinationInfo('');
+
       console.log('Vaccination information saved successfully.');
+      navigation.goBack(); // Automatically go back to the previous screen
+
     } catch (error) {
       console.error('Error saving vaccination information:', error);
+      Alert.alert('Error', 'Failed to save the information.');
     }
   };
 
   const handleShowAllVaccinations = () => {
-    console.log('Showing all vaccinations');
-    navigation.navigate("AllVaccinations")
+    navigation.navigate('AllVaccinations');
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Add Vaccination</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Vaccination Name:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter vaccination name"
+          value={vaccinationName}
+          onChangeText={setVaccinationName}
+        />
+      </View>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Next Vaccination:</Text>
         <TouchableOpacity style={styles.input} onPress={() => setShowCalendar(true)}>
@@ -54,7 +73,7 @@ const VaccinationReminders = ({navigation}) => {
         />
       )}
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Vaccination Info:</Text>
+        <Text style={styles.label}>Vaccination Info (optional):</Text>
         <TextInput
           style={[styles.input, styles.multilineInput]}
           placeholder="Enter vaccination information"
